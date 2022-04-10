@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define END_BREAK {if(fv) printf("\n"); return 0;}
 #define V_OUTPUT(X) {if(fv) printf(X);}
                 
 
@@ -19,8 +18,6 @@ int opf(char op,unsigned long long addr,struct line * p);
 
 int main(int argc, char *argv[])
 {
-
-    printf("abcabc");
 
     FILE * input;
 
@@ -69,8 +66,8 @@ int main(int argc, char *argv[])
 
     }
 
-    struct line * p=malloc(fs*fe*sizeof(line));
-    for(int i=0;i<fs*fe;i++)
+    struct line * p=malloc((1<<fs)*fe*sizeof(line));
+    for(int i=0;i<(1<<fs)*fe;i++)
         {
             p[i].vaild=0;
             p[i].life=0;
@@ -95,8 +92,15 @@ void parseFile(FILE * input,struct line * p){
         {
             if (fv)
                 printf("%c %llx,%d",op,addr,size);
+            if(op=='M')
+            {
+                opf('L',addr,p);
+                opf('S',addr,p);
 
-            opf(op,addr,p);
+            }
+            else
+                opf(op,addr,p);
+            V_OUTPUT("\n");
         }
     }
 }
@@ -119,7 +123,7 @@ int opf(char op,unsigned long long addr,struct line * p){
                 p[i].life++;
             
             p[i].life=0;
-            END_BREAK
+            return 0;
         }
     }
 
@@ -139,13 +143,7 @@ int opf(char op,unsigned long long addr,struct line * p){
                 p[i].life++;
             
             p[i].life=0;
-
-            if(op=='M')
-            {
-                hit++;
-                V_OUTPUT(" hit")
-            }
-            END_BREAK
+            return 0;
         }
     }
 
@@ -167,10 +165,5 @@ int opf(char op,unsigned long long addr,struct line * p){
 
     evict++;
     V_OUTPUT(" eviction")
-    if(op=='M')
-    {
-        hit++;
-        V_OUTPUT(" hit")
-    }
-    END_BREAK
+    return 0;
 }
